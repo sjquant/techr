@@ -1,0 +1,8 @@
+[package]
+name = "techr"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "techr"
+crate-type = ["cdylib", "rlib"]
