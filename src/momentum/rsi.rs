@@ -1,5 +1,10 @@
 pub fn rsi(data: &[f64], window: usize) -> Vec<Option<f64>> {
     let mut rsi = vec![None; data.len()];
+
+    if data.len() < window {
+        return rsi;
+    }
+
     let mut total_up = 0.0;
     let mut total_down = 0.0;
     let mut avg_up;

@@ -2,6 +2,10 @@ pub fn sma(data: &[f64], window: usize) -> Vec<Option<f64>> {
     let mut sma = vec![None; data.len()];
     let mut sum = 0.0;
 
+    if data.len() < window {
+        return sma;
+    }
+
     for i in 0..data.len() {
         sum += data[i];
         if i >= window {
@@ -17,14 +21,37 @@ pub fn sma(data: &[f64], window: usize) -> Vec<Option<f64>> {
 
 #[cfg(test)]
 mod tests {
+    use crate::utils::round_vec;
+
     use super::*;
 
     #[test]
     fn test_sma() {
-        let input = vec![1.0, 2.0, 3.0, 4.0, 5.0];
-        let result = sma(&input, 3);
+        let input = vec![
+            100.0, 102.5, 99.8, 101.7, 103.2, 98.5, 100.9, 102.1, 104.3, 103.8, 105.2, 106.7,
+            104.9, 107.3, 108.1,
+        ];
+        let result = sma(&input, 5);
 
-        let expected = vec![None, None, Some(2.0), Some(3.0), Some(4.0)];
-        assert_eq!(result, expected);
+        assert_eq!(
+            round_vec(result, 4),
+            [
+                None,
+                None,
+                None,
+                None,
+                Some(101.44),
+                Some(101.14),
+                Some(100.82),
+                Some(101.28),
+                Some(101.8),
+                Some(101.92),
+                Some(103.26),
+                Some(104.42),
+                Some(104.98),
+                Some(105.58),
+                Some(106.44)
+            ]
+        );
     }
 }

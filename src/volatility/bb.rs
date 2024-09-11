@@ -9,6 +9,10 @@ pub fn bb(
     let mut up = vec![None; data.len()];
     let mut down = vec![None; data.len()];
 
+    if data.len() < window {
+        return (up, center, down);
+    }
+
     for i in window - 1..data.len() {
         if center[i].is_some() {
             let stddev = calc_stddev(&data[i + 1 - window..i]);
