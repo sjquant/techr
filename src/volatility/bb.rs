@@ -3,7 +3,7 @@ use crate::{trend::sma, utils::calc_stddev};
 pub fn bb(
     data: &[f64],
     window: usize,
-    multiplier: f64,
+    multiplier: Option<f64>,
 ) -> (Vec<Option<f64>>, Vec<Option<f64>>, Vec<Option<f64>>) {
     let center = sma(data, window);
     let mut upper_band = vec![None; data.len()];
@@ -12,6 +12,8 @@ pub fn bb(
     if data.len() < window {
         return (upper_band, center, lower_band);
     }
+
+    let multiplier = multiplier.unwrap_or(2.0);
 
     for i in window - 1..data.len() {
         if center[i].is_some() {
@@ -37,7 +39,7 @@ mod tests {
             103.50, 102.75, 101.25, 100.00,
         ];
 
-        let (up, center, down) = bb(&data, 5, 2.0);
+        let (up, center, down) = bb(&data, 5, Some(2.0));
         assert_eq!(
             round_vec(up, 4),
             [
