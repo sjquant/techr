@@ -6,22 +6,22 @@ pub fn bb(
     multiplier: f64,
 ) -> (Vec<Option<f64>>, Vec<Option<f64>>, Vec<Option<f64>>) {
     let center = sma(data, window);
-    let mut up = vec![None; data.len()];
-    let mut down = vec![None; data.len()];
+    let mut upper_band = vec![None; data.len()];
+    let mut lower_band = vec![None; data.len()];
 
     if data.len() < window {
-        return (up, center, down);
+        return (upper_band, center, lower_band);
     }
 
     for i in window - 1..data.len() {
         if center[i].is_some() {
             let stddev = calc_stddev(&data[i + 1 - window..i]);
-            up[i] = Some(center[i].unwrap() + multiplier * stddev);
-            down[i] = Some(center[i].unwrap() - multiplier * stddev);
+            upper_band[i] = Some(center[i].unwrap() + multiplier * stddev);
+            lower_band[i] = Some(center[i].unwrap() - multiplier * stddev);
         }
     }
 
-    (up, center, down)
+    (upper_band, center, lower_band)
 }
 
 #[cfg(test)]
