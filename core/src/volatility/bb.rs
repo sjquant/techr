@@ -2,22 +2,22 @@ use crate::{trend::sma, utils::calc_stddev};
 
 pub fn bb(
     data: &[f64],
-    window: usize,
+    period: usize,
     multiplier: Option<f64>,
 ) -> (Vec<Option<f64>>, Vec<Option<f64>>, Vec<Option<f64>>) {
-    let center = sma(data, window);
+    let center = sma(data, period);
     let mut upper_band = vec![None; data.len()];
     let mut lower_band = vec![None; data.len()];
 
-    if data.len() < window {
+    if data.len() < period {
         return (upper_band, center, lower_band);
     }
 
     let multiplier = multiplier.unwrap_or(2.0);
 
-    for i in window - 1..data.len() {
+    for i in period - 1..data.len() {
         if center[i].is_some() {
-            let stddev = calc_stddev(&data[i + 1 - window..i]);
+            let stddev = calc_stddev(&data[i + 1 - period..i]);
             upper_band[i] = Some(center[i].unwrap() + multiplier * stddev);
             lower_band[i] = Some(center[i].unwrap() - multiplier * stddev);
         }

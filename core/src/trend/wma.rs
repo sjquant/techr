@@ -1,23 +1,23 @@
-pub fn wma(data: &[f64], window: usize) -> Vec<Option<f64>> {
+pub fn wma(data: &[f64], period: usize) -> Vec<Option<f64>> {
     let mut result = vec![None; data.len()];
 
-    if data.len() < window {
+    if data.len() < period {
         return result;
     }
 
-    let weight_sum = (window * (window + 1)) / 2;
+    let weight_sum = (period * (period + 1)) / 2;
     let mut weighted_sum = 0.0;
 
-    // Initialize the first window
-    for i in 0..window {
+    // Initialize the first period
+    for i in 0..period {
         weighted_sum += data[i] * (i + 1) as f64;
     }
 
-    for i in window - 1..data.len() {
+    for i in period - 1..data.len() {
         result[i] = Some(weighted_sum / weight_sum as f64);
         if i + 1 < data.len() {
-            weighted_sum = weighted_sum + data[i + 1] * window as f64
-                - data[i + 1 - window..=i].iter().sum::<f64>();
+            weighted_sum = weighted_sum + data[i + 1] * period as f64
+                - data[i + 1 - period..=i].iter().sum::<f64>();
         }
     }
 
@@ -36,8 +36,8 @@ mod tests {
             100.0, 102.5, 99.8, 101.7, 103.2, 98.5, 100.9, 102.1, 104.3, 103.8, 105.2, 106.7,
             104.9, 107.3, 108.1,
         ];
-        let window = 5;
-        let result = wma(&input, window);
+        let period = 5;
+        let result = wma(&input, period);
         assert_eq!(
             round_vec(result, 4),
             [

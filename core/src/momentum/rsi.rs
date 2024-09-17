@@ -1,7 +1,7 @@
-pub fn rsi(data: &[f64], window: usize) -> Vec<Option<f64>> {
+pub fn rsi(data: &[f64], period: usize) -> Vec<Option<f64>> {
     let mut rsi = vec![None; data.len()];
 
-    if data.len() < window {
+    if data.len() < period {
         return rsi;
     }
 
@@ -10,7 +10,7 @@ pub fn rsi(data: &[f64], window: usize) -> Vec<Option<f64>> {
     let mut avg_up;
     let mut avg_down;
 
-    for i in 1..window {
+    for i in 1..period {
         let change = data[i] - data[i - 1];
         if change > 0.0 {
             total_up += change;
@@ -19,15 +19,15 @@ pub fn rsi(data: &[f64], window: usize) -> Vec<Option<f64>> {
         }
     }
 
-    avg_up = total_up / (window - 1) as f64;
-    avg_down = total_down / (window - 1) as f64;
+    avg_up = total_up / (period - 1) as f64;
+    avg_down = total_down / (period - 1) as f64;
 
-    for i in window..data.len() {
+    for i in period..data.len() {
         let change = data[i] - data[i - 1];
         let up = change.max(0.0);
         let down = change.abs();
-        avg_up = (avg_up * (window - 1) as f64 + up) / window as f64;
-        avg_down = (avg_down * (window - 1) as f64 + down) / window as f64;
+        avg_up = (avg_up * (period - 1) as f64 + up) / period as f64;
+        avg_down = (avg_down * (period - 1) as f64 + down) / period as f64;
 
         let rsi_point = if avg_down == 0.0 {
             100.0

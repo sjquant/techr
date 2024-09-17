@@ -6,14 +6,14 @@ use techr::sma as techr_sma;
 
 #[derive(Deserialize)]
 struct SMAKwargs {
-    window: u32,
+    period: u32,
 }
 
 #[polars_expr(output_type=Float64)]
 fn sma(inputs: &[Series], kwargs: SMAKwargs) -> PolarsResult<Series> {
-    let window = kwargs.window as usize;
+    let period = kwargs.period as usize;
     let input = inputs[0].f64()?.to_vec_null_aware().left().unwrap();
-    let out = techr_sma(&input, window);
+    let out = techr_sma(&input, period);
     let out_series: Series = out.into_iter().collect();
     Ok(out_series)
 }

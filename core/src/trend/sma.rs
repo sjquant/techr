@@ -1,18 +1,18 @@
-pub fn sma(data: &[f64], window: usize) -> Vec<Option<f64>> {
+pub fn sma(data: &[f64], period: usize) -> Vec<Option<f64>> {
     let mut sma = vec![None; data.len()];
     let mut sum = 0.0;
 
-    if data.len() < window {
+    if data.len() < period {
         return sma;
     }
 
     for i in 0..data.len() {
         sum += data[i];
-        if i >= window {
-            sum -= data[i - window];
+        if i >= period {
+            sum -= data[i - period];
         }
-        if i >= window - 1 {
-            sma[i] = Some(sum / window as f64);
+        if i >= period - 1 {
+            sma[i] = Some(sum / period as f64);
         }
     }
 

@@ -4,7 +4,7 @@ use pyo3::{pymodule, Bound, PyResult};
 use pyo3_polars::PolarsAllocator;
 
 #[pymodule]
-fn _internal(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn _polars_techr(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
     Ok(())
 }
