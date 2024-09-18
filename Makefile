@@ -4,10 +4,6 @@
 # so doesn't render color without some help
 export CARGO_TERM_COLOR=$(shell (test -t 0 && echo "always") || echo "auto")
 
-# maturin develop only makes sense inside a virtual env, is otherwise
-# more or less equivalent to pip install -e just a little nicer
-USE_MATURIN = $(shell [ "$$VIRTUAL_ENV" != "" ] && (which maturin))
-
 .PHONY: build-dev-polars
 build-dev-polars:
 	@rm -f polars/polars_techr/*.so
@@ -20,6 +16,13 @@ build-prod-polars:
 	cd polars && maturin build --release
 
 
+.PHONY: test-core
+test-core:
+	cd core && cargo test
+
 .PHONY: test-polars
 test-polars:
 	cd polars && pytest
+
+.PHONY: test
+test: test-core test-polars

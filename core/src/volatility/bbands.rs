@@ -1,6 +1,6 @@
-use crate::{trend::sma, utils::calc_stddev};
+use crate::{overlap::sma, utils::stddev_scalar};
 
-pub fn bb(
+pub fn bbands(
     data: &[f64],
     period: usize,
     multiplier: Option<f64>,
@@ -17,7 +17,7 @@ pub fn bb(
 
     for i in period - 1..data.len() {
         if center[i].is_some() {
-            let stddev = calc_stddev(&data[i + 1 - period..i]);
+            let stddev = stddev_scalar(&data[i + 1 - period..i]);
             upper_band[i] = Some(center[i].unwrap() + multiplier * stddev);
             lower_band[i] = Some(center[i].unwrap() - multiplier * stddev);
         }
@@ -33,13 +33,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_bb() {
+    fn test_bbands() {
         let data = vec![
             100.25, 101.50, 99.75, 102.00, 103.25, 101.75, 100.50, 99.00, 100.75, 102.50, 104.00,
             103.50, 102.75, 101.25, 100.00,
         ];
 
-        let (up, center, down) = bb(&data, 5, Some(2.0));
+        let (up, center, down) = bbands(&data, 5, Some(2.0));
         assert_eq!(
             round_vec(up, 4),
             [
