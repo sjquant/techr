@@ -1,3 +1,3 @@
-pub mod bb;
+pub mod bbands;
 
-pub use bb::bb;
+pub use bbands::bbands;

@@ -1,23 +1,23 @@
-use crate::{trend::sma, utils::calc_stddev};
+use crate::{overlap::sma, utils::stddev_scalar};
 
-pub fn bb(
+pub fn bbands(
     data: &[f64],
-    window: usize,
+    period: usize,
     multiplier: Option<f64>,
 ) -> (Vec<Option<f64>>, Vec<Option<f64>>, Vec<Option<f64>>) {
-    let center = sma(data, window);
+    let center = sma(data, period);
     let mut upper_band = vec![None; data.len()];
     let mut lower_band = vec![None; data.len()];
 
-    if data.len() < window {
+    if data.len() < period {
         return (upper_band, center, lower_band);
     }
 
     let multiplier = multiplier.unwrap_or(2.0);
 
-    for i in window - 1..data.len() {
+    for i in period - 1..data.len() {
         if center[i].is_some() {
-            let stddev = calc_stddev(&data[i + 1 - window..i]);
+            let stddev = stddev_scalar(&data[i + 1 - period..i]);
             upper_band[i] = Some(center[i].unwrap() + multiplier * stddev);
             lower_band[i] = Some(center[i].unwrap() - multiplier * stddev);
         }
@@ -33,13 +33,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_bb() {
+    fn test_bbands() {
         let data = vec![
             100.25, 101.50, 99.75, 102.00, 103.25, 101.75, 100.50, 99.00, 100.75, 102.50, 104.00,
             103.50, 102.75, 101.25, 100.00,
         ];
 
-        let (up, center, down) = bb(&data, 5, Some(2.0));
+        let (up, center, down) = bbands(&data, 5, Some(2.0));
         assert_eq!(
             round_vec(up, 4),
             [

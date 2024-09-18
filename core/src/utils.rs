@@ -1,4 +1,4 @@
-pub fn round(value: f64, decimal_places: u32) -> f64 {
+pub fn round_scalar(value: f64, decimal_places: u32) -> f64 {
     let factor = 10.0f64.powi(decimal_places as i32);
     (value * factor).round() / factor
 }
@@ -14,7 +14,7 @@ pub fn round_vec(vec: Vec<Option<f64>>, decimal_places: u32) -> Vec<Option<f64>>
         .collect()
 }
 
-pub fn calc_stddev(data: &[f64]) -> f64 {
+pub fn stddev_scalar(data: &[f64]) -> f64 {
     let mean = data.iter().sum::<f64>() / data.len() as f64;
     let variance = data.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / data.len() as f64;
     variance.sqrt()
@@ -36,7 +36,7 @@ mod tests {
         ];
 
         for (input, decimal_places, expected) in test_cases {
-            let result = round(input, decimal_places);
+            let result = round_scalar(input, decimal_places);
             assert_eq!(result, expected);
         }
     }
@@ -73,7 +73,7 @@ mod tests {
             100.25, 101.50, 99.75, 102.00, 103.25, 101.75, 100.50, 99.00, 100.75, 102.50, 104.00,
             103.50, 102.75, 101.25, 102.00,
         ];
-        let result = calc_stddev(&data);
-        assert_eq!(round(result, 4), 1.3808);
+        let result = stddev_scalar(&data);
+        assert_eq!(round_scalar(result, 4), 1.3808);
     }
 }

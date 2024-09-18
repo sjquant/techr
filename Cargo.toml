@@ -3,3 +3,4 @@ members = [
     "core",
     "polars"
 ]
+resolver = "2"
