@@ -1,3 +1,3 @@
 pub mod rsi;
 
-pub use rsi::rsi;
+pub use rsi::*;
