@@ -21,37 +21,27 @@ pub fn sma(data: &[f64], period: usize) -> Vec<Option<f64>> {
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::round_vec;
-
     use super::*;
+    use crate::testutils;
+    use crate::utils::round_vec;
 
     #[test]
     fn test_sma() {
-        let input = vec![
-            100.0, 102.5, 99.8, 101.7, 103.2, 98.5, 100.9, 102.1, 104.3, 103.8, 105.2, 106.7,
-            104.9, 107.3, 108.1,
-        ];
-        let result = sma(&input, 5);
+        let test_cases = vec!["005930", "TSLA"];
+        for symbol in test_cases {
+            let input = testutils::load_data(&format!("../data/{}.json", symbol), "c");
+            let result = sma(&input, 20);
+            let expected = testutils::load_expected::<Option<f64>>(&format!(
+                "../data/expected/sma_{}.json",
+                symbol
+            ));
 
-        assert_eq!(
-            round_vec(result, 4),
-            [
-                None,
-                None,
-                None,
-                None,
-                Some(101.44),
-                Some(101.14),
-                Some(100.82),
-                Some(101.28),
-                Some(101.8),
-                Some(101.92),
-                Some(103.26),
-                Some(104.42),
-                Some(104.98),
-                Some(105.58),
-                Some(106.44)
-            ]
-        );
+            assert_eq!(
+                round_vec(result, 8),
+                expected,
+                "SMA test failed for symbol {}.",
+                symbol
+            );
+        }
     }
 }

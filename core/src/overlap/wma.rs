@@ -26,37 +26,27 @@ pub fn wma(data: &[f64], period: usize) -> Vec<Option<f64>> {
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::round_vec;
-
     use super::*;
+    use crate::testutils;
+    use crate::utils::round_vec;
 
     #[test]
     fn test_wma() {
-        let input = vec![
-            100.0, 102.5, 99.8, 101.7, 103.2, 98.5, 100.9, 102.1, 104.3, 103.8, 105.2, 106.7,
-            104.9, 107.3, 108.1,
-        ];
-        let period = 5;
-        let result = wma(&input, period);
-        assert_eq!(
-            round_vec(result, 4),
-            [
-                None,
-                None,
-                None,
-                None,
-                Some(101.8133),
-                Some(100.8333),
-                Some(100.7533),
-                Some(101.18),
-                Some(102.1867),
-                Some(102.8533),
-                Some(103.9467),
-                Some(105.0933),
-                Some(105.2533),
-                Some(106.0267),
-                Some(106.8667)
-            ]
-        );
+        let test_cases = vec!["005930", "TSLA"];
+        for symbol in test_cases {
+            let input = testutils::load_data(&format!("../data/{}.json", symbol), "c");
+            let result = wma(&input, 20);
+            let expected = testutils::load_expected::<Option<f64>>(&format!(
+                "../data/expected/wma_{}.json",
+                symbol
+            ));
+
+            assert_eq!(
+                round_vec(result, 8),
+                expected,
+                "WMA test failed for symbol {}.",
+                symbol
+            );
+        }
     }
 }

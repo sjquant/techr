@@ -1,5 +1,6 @@
 pub mod momentum;
 pub mod overlap;
+pub mod testutils;
 pub mod utils;
 pub mod volatility;
 

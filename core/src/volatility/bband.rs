@@ -1,4 +1,6 @@
-use crate::{overlap::sma, utils::stddev_scalar};
+use crate::overlap::sma;
+
+use crate::utils::round_scalar;
 
 pub fn bband(
     data: &[f64],
@@ -6,199 +8,139 @@ pub fn bband(
     multiplier: Option<f64>,
 ) -> (Vec<Option<f64>>, Vec<Option<f64>>, Vec<Option<f64>>) {
     let center = sma(data, period);
-    let mut upper_band = vec![None; data.len()];
-    let mut lower_band = vec![None; data.len()];
-
-    if data.len() < period {
-        return (upper_band, center, lower_band);
-    }
-
-    let multiplier = multiplier.unwrap_or(2.0);
-
-    for i in period - 1..data.len() {
-        if center[i].is_some() {
-            let stddev = stddev_scalar(&data[i + 1 - period..i]);
-            upper_band[i] = Some(center[i].unwrap() + multiplier * stddev);
-            lower_band[i] = Some(center[i].unwrap() - multiplier * stddev);
-        }
-    }
-
+    let (upper_band, lower_band) = bband_bands(data, period, multiplier);
     (upper_band, center, lower_band)
 }
 
-pub fn bband_upper(data: &[f64], period: usize, multiplier: Option<f64>) -> Vec<Option<f64>> {
-    let center = sma(data, period);
+fn bband_bands(
+    data: &[f64],
+    period: usize,
+    multiplier: Option<f64>,
+) -> (Vec<Option<f64>>, Vec<Option<f64>>) {
     let mut upper_band = vec![None; data.len()];
-
-    if data.len() < period {
-        return upper_band;
-    }
-
+    let mut lower_band = vec![None; data.len()];
+    let mut sum = 0.0;
+    let mut sum_sq = 0.0;
     let multiplier = multiplier.unwrap_or(2.0);
 
-    for i in period - 1..data.len() {
-        if center[i].is_some() {
-            let stddev = stddev_scalar(&data[i + 1 - period..i]);
-            upper_band[i] = Some(center[i].unwrap() + multiplier * stddev);
+    if data.len() < period {
+        return (upper_band, lower_band);
+    }
+
+    for i in 0..data.len() {
+        sum += data[i];
+        sum_sq += data[i] * data[i];
+
+        if i >= period {
+            sum -= data[i - period];
+            sum_sq -= data[i - period] * data[i - period];
+        }
+
+        if i >= period - 1 {
+            let mean = sum / period as f64;
+            let variance = (sum_sq / period as f64) - (mean * mean);
+            let stddev = variance.sqrt();
+            let deviation = multiplier * stddev;
+            upper_band[i] = Some(round_scalar(mean + deviation, 8));
+            lower_band[i] = Some(round_scalar(mean - deviation, 8));
         }
     }
 
-    upper_band
+    (upper_band, lower_band)
+}
+
+pub fn bband_upper(data: &[f64], period: usize, multiplier: Option<f64>) -> Vec<Option<f64>> {
+    bband_bands(data, period, multiplier).0
 }
 
 pub fn bband_lower(data: &[f64], period: usize, multiplier: Option<f64>) -> Vec<Option<f64>> {
-    let center = sma(data, period);
-    let mut lower_band = vec![None; data.len()];
-
-    if data.len() < period {
-        return lower_band;
-    }
-
-    let multiplier = multiplier.unwrap_or(2.0);
-
-    for i in period - 1..data.len() {
-        if center[i].is_some() {
-            let stddev = stddev_scalar(&data[i + 1 - period..i]);
-            lower_band[i] = Some(center[i].unwrap() - multiplier * stddev);
-        }
-    }
-
-    lower_band
+    bband_bands(data, period, multiplier).1
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::round_vec;
-
     use super::*;
+    use crate::testutils;
+    use crate::utils::round_vec;
 
     #[test]
     fn test_bband() {
-        let data = vec![
-            100.25, 101.50, 99.75, 102.00, 103.25, 101.75, 100.50, 99.00, 100.75, 102.50, 104.00,
-            103.50, 102.75, 101.25, 100.00,
-        ];
+        let test_cases = vec!["005930", "TSLA"];
+        for symbol in test_cases {
+            let input = testutils::load_data(&format!("../data/{}.json", symbol), "c");
+            let (upper, middle, lower) = bband(&input, 20, None);
 
-        let (up, center, down) = bband(&data, 5, Some(2.0));
-        assert_eq!(
-            round_vec(up, 4),
-            [
-                None,
-                None,
-                None,
-                None,
-                Some(103.1700),
-                Some(104.1625),
-                Some(103.9594),
-                Some(103.2526),
-                Some(104.1825),
-                Some(102.8685),
-                Some(103.8343),
-                Some(105.6979),
-                Some(105.1843),
-                Some(103.9924),
-                Some(104.3767)
-            ]
-        );
-        assert_eq!(
-            round_vec(center, 4),
-            vec![
-                None,
-                None,
-                None,
-                None,
-                Some(101.35),
-                Some(101.65),
-                Some(101.45),
-                Some(101.3),
-                Some(101.05),
-                Some(100.9),
-                Some(101.35),
-                Some(101.95),
-                Some(102.7),
-                Some(102.8),
-                Some(102.3)
-            ]
-        );
-        assert_eq!(
-            round_vec(down, 4),
-            [
-                None,
-                None,
-                None,
-                None,
-                Some(99.53),
-                Some(99.1375),
-                Some(98.9406),
-                Some(99.3474),
-                Some(97.9175),
-                Some(98.9315),
-                Some(98.8657),
-                Some(98.2021),
-                Some(100.2157),
-                Some(101.6076),
-                Some(100.2233)
-            ]
-        );
+            let expected_upper = testutils::load_expected::<Option<f64>>(&format!(
+                "../data/expected/bband_upper_{}.json",
+                symbol
+            ));
+            let expected_middle = testutils::load_expected::<Option<f64>>(&format!(
+                "../data/expected/sma_{}.json",
+                symbol
+            ));
+            let expected_lower = testutils::load_expected::<Option<f64>>(&format!(
+                "../data/expected/bband_lower_{}.json",
+                symbol
+            ));
+
+            assert_eq!(
+                round_vec(upper, 8),
+                expected_upper,
+                "BBAND upper test failed for symbol {}.",
+                symbol
+            );
+            assert_eq!(
+                round_vec(middle, 8),
+                expected_middle,
+                "BBAND middle test failed for symbol {}.",
+                symbol
+            );
+            assert_eq!(
+                round_vec(lower, 8),
+                expected_lower,
+                "BBAND lower test failed for symbol {}.",
+                symbol
+            );
+        }
     }
 
     #[test]
     fn test_bband_upper() {
-        let data = vec![
-            100.25, 101.50, 99.75, 102.00, 103.25, 101.75, 100.50, 99.00, 100.75, 102.50, 104.00,
-            103.50, 102.75, 101.25, 100.00,
-        ];
+        let test_cases = vec!["005930", "TSLA"];
+        for symbol in test_cases {
+            let input = testutils::load_data(&format!("../data/{}.json", symbol), "c");
+            let result = bband_upper(&input, 20, None);
+            let expected = testutils::load_expected::<Option<f64>>(&format!(
+                "../data/expected/bband_upper_{}.json",
+                symbol
+            ));
 
-        let upper = bband_upper(&data, 5, Some(2.0));
-        assert_eq!(
-            round_vec(upper, 4),
-            [
-                None,
-                None,
-                None,
-                None,
-                Some(103.1700),
-                Some(104.1625),
-                Some(103.9594),
-                Some(103.2526),
-                Some(104.1825),
-                Some(102.8685),
-                Some(103.8343),
-                Some(105.6979),
-                Some(105.1843),
-                Some(103.9924),
-                Some(104.3767)
-            ]
-        );
+            assert_eq!(
+                round_vec(result, 8),
+                expected,
+                "BBAND upper test failed for symbol {}.",
+                symbol
+            );
+        }
     }
 
     #[test]
     fn test_bband_lower() {
-        let data = vec![
-            100.25, 101.50, 99.75, 102.00, 103.25, 101.75, 100.50, 99.00, 100.75, 102.50, 104.00,
-            103.50, 102.75, 101.25, 100.00,
-        ];
+        let test_cases = vec!["005930", "TSLA"];
+        for symbol in test_cases {
+            let input = testutils::load_data(&format!("../data/{}.json", symbol), "c");
+            let result = bband_lower(&input, 20, None);
+            let expected = testutils::load_expected::<Option<f64>>(&format!(
+                "../data/expected/bband_lower_{}.json",
+                symbol
+            ));
 
-        let lower = bband_lower(&data, 5, Some(2.0));
-        assert_eq!(
-            round_vec(lower, 4),
-            [
-                None,
-                None,
-                None,
-                None,
-                Some(99.53),
-                Some(99.1375),
-                Some(98.9406),
-                Some(99.3474),
-                Some(97.9175),
-                Some(98.9315),
-                Some(98.8657),
-                Some(98.2021),
-                Some(100.2157),
-                Some(101.6076),
-                Some(100.2233)
-            ]
-        );
+            assert_eq!(
+                round_vec(result, 8),
+                expected,
+                "BBAND lower test failed for symbol {}.",
+                symbol
+            );
+        }
     }
 }

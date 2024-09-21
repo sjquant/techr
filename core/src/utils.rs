@@ -14,12 +14,6 @@ pub fn round_vec(vec: Vec<Option<f64>>, decimal_places: u32) -> Vec<Option<f64>>
         .collect()
 }
 
-pub fn stddev_scalar(data: &[f64]) -> f64 {
-    let mean = data.iter().sum::<f64>() / data.len() as f64;
-    let variance = data.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / data.len() as f64;
-    variance.sqrt()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -65,15 +59,5 @@ mod tests {
             let result = round_vec(input, decimal_places);
             assert_eq!(result, expected);
         }
-    }
-
-    #[test]
-    fn test_calc_stddev() {
-        let data = vec![
-            100.25, 101.50, 99.75, 102.00, 103.25, 101.75, 100.50, 99.00, 100.75, 102.50, 104.00,
-            103.50, 102.75, 101.25, 102.00,
-        ];
-        let result = stddev_scalar(&data);
-        assert_eq!(round_scalar(result, 4), 1.3808);
     }
 }
