@@ -1,13 +1,15 @@
 mod cci;
 mod disp;
+mod mfi;
 mod mom;
 mod roc;
 mod rsi;
 mod willr;
 
-pub use cci::cci;
-pub use disp::disp;
-pub use mom::mom;
-pub use roc::roc;
-pub use rsi::rsi;
-pub use willr::willr;
+pub use cci::*;
+pub use disp::*;
+pub use mfi::*;
+pub use mom::*;
+pub use roc::*;
+pub use rsi::*;
+pub use willr::*;
