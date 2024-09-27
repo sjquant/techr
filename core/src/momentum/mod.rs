@@ -1,5 +1,6 @@
 mod cci;
 mod disp;
+mod macd;
 mod mfi;
 mod mom;
 mod roc;
@@ -8,6 +9,7 @@ mod willr;
 
 pub use cci::*;
 pub use disp::*;
+pub use macd::*;
 pub use mfi::*;
 pub use mom::*;
 pub use roc::*;
