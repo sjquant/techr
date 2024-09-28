@@ -12,9 +12,9 @@ pub fn pchan(
         return (upper, middle, lower);
     }
 
-    for i in period - 1..len {
-        let slice_high = &highs[i + 1 - period..=i];
-        let slice_low = &lows[i + 1 - period..=i];
+    for i in period..len {
+        let slice_high = &highs[i - period..i];
+        let slice_low = &lows[i - period..i];
 
         let max_high = slice_high.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
         let min_low = slice_low.iter().cloned().fold(f64::INFINITY, f64::min);
