@@ -1,5 +1,6 @@
 mod cci;
 mod cmf;
+mod co;
 mod disp;
 mod macd;
 mod mfi;
@@ -14,6 +15,7 @@ mod willr;
 
 pub use cci::*;
 pub use cmf::*;
+pub use co::*;
 pub use disp::*;
 pub use macd::*;
 pub use mfi::*;
