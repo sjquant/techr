@@ -1,3 +1,5 @@
+use crate::utils::{find_max, find_min};
+
 pub fn ichimoku(
     highs: &[f64],
     lows: &[f64],
@@ -22,18 +24,14 @@ pub fn ichimoku(
 
     for i in 0..len {
         if i >= tenkan_period - 1 {
-            let (max_high, min_low) = get_max_high_min_low(
-                &highs[i + 1 - tenkan_period..=i],
-                &lows[i + 1 - tenkan_period..=i],
-            );
+            let max_high = find_max(&highs[i + 1 - tenkan_period..=i]);
+            let min_low = find_min(&lows[i + 1 - tenkan_period..=i]);
             tenkan[i] = Some((max_high + min_low) / 2.0);
         }
 
         if i >= kijun_period - 1 {
-            let (max_high, min_low) = get_max_high_min_low(
-                &highs[i + 1 - kijun_period..=i],
-                &lows[i + 1 - kijun_period..=i],
-            );
+            let max_high = find_max(&highs[i + 1 - kijun_period..=i]);
+            let min_low = find_min(&lows[i + 1 - kijun_period..=i]);
             kijun[i] = Some((max_high + min_low) / 2.0);
         }
 
@@ -46,21 +44,13 @@ pub fn ichimoku(
         }
 
         if i >= senkou_b_period - 1 {
-            let (max_high, min_low) = get_max_high_min_low(
-                &highs[i + 1 - senkou_b_period..=i],
-                &lows[i + 1 - senkou_b_period..=i],
-            );
+            let max_high = find_max(&highs[i + 1 - senkou_b_period..=i]);
+            let min_low = find_min(&lows[i + 1 - senkou_b_period..=i]);
             senkou_b[i + kijun_period] = Some((max_high + min_low) / 2.0);
         }
     }
 
     (tenkan, kijun, chikou, senkou_a, senkou_b)
-}
-
-fn get_max_high_min_low(highs: &[f64], lows: &[f64]) -> (f64, f64) {
-    let max_high = highs.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
-    let min_low = lows.iter().cloned().fold(f64::INFINITY, f64::min);
-    (max_high, min_low)
 }
 
 pub fn ichimoku_tenkan(

@@ -1,3 +1,5 @@
+use crate::utils::{find_max, find_min};
+
 pub fn pchan(
     highs: &[f64],
     lows: &[f64],
@@ -13,11 +15,8 @@ pub fn pchan(
     }
 
     for i in period..len {
-        let slice_high = &highs[i - period..i];
-        let slice_low = &lows[i - period..i];
-
-        let max_high = slice_high.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
-        let min_low = slice_low.iter().cloned().fold(f64::INFINITY, f64::min);
+        let max_high = find_max(&highs[i - period..i]);
+        let min_low = find_min(&lows[i - period..i]);
 
         upper[i] = Some(max_high);
         lower[i] = Some(min_low);

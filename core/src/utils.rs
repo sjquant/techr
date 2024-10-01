@@ -14,6 +14,20 @@ pub fn round_vec(vec: Vec<Option<f64>>, decimal_places: u32) -> Vec<Option<f64>>
         .collect()
 }
 
+pub fn calc_mean(data: &[f64]) -> f64 {
+    let sum: f64 = data.iter().sum();
+    let count = data.len();
+    sum / count as f64
+}
+
+pub fn find_max(data: &[f64]) -> f64 {
+    data.iter().cloned().fold(f64::NEG_INFINITY, f64::max)
+}
+
+pub fn find_min(data: &[f64]) -> f64 {
+    data.iter().cloned().fold(f64::INFINITY, f64::min)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -59,5 +73,23 @@ mod tests {
             let result = round_vec(input, decimal_places);
             assert_eq!(result, expected);
         }
+    }
+
+    #[test]
+    fn test_calc_mean() {
+        let result = calc_mean(&vec![1.0, 2.0, 3.0, 4.0, 5.0]);
+        assert_eq!(result, 3.0);
+    }
+
+    #[test]
+    fn test_find_max() {
+        let result = find_max(&vec![1.0, 2.0, 3.0, 4.0, 5.0]);
+        assert_eq!(result, 5.0);
+    }
+
+    #[test]
+    fn test_find_min() {
+        let result = find_min(&vec![1.0, 2.0, 3.0, 4.0, 5.0]);
+        assert_eq!(result, 1.0);
     }
 }

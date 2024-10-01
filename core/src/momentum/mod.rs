@@ -6,6 +6,7 @@ mod mom;
 mod psl;
 mod roc;
 mod rsi;
+mod stochf;
 mod willr;
 
 pub use cci::*;
@@ -16,4 +17,5 @@ pub use mom::*;
 pub use psl::*;
 pub use roc::*;
 pub use rsi::*;
+pub use stochf::*;
 pub use willr::*;
