@@ -1,3 +1,5 @@
+use crate::utils::calc_clv;
+
 pub fn ad(highs: &[f64], lows: &[f64], closes: &[f64], volumes: &[f64]) -> Vec<Option<f64>> {
     let mut ad = vec![None; highs.len()];
 
@@ -9,16 +11,7 @@ pub fn ad(highs: &[f64], lows: &[f64], closes: &[f64], volumes: &[f64]) -> Vec<O
 
     let mut ad_point = 0.0;
     for i in 0..len {
-        let high = highs[i];
-        let low = lows[i];
-        let close = closes[i];
-        let volume = volumes[i];
-
-        if (2.0 * close - low - high).abs() < f64::EPSILON || (high - low).abs() < f64::EPSILON {
-            ad_point += 0.0;
-        } else {
-            ad_point += ((2.0 * close - low - high) / (high - low)) * volume;
-        }
+        ad_point += calc_clv(highs[i], lows[i], closes[i]) * volumes[i];
         ad[i] = Some(ad_point);
     }
 

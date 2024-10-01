@@ -1,4 +1,5 @@
 mod cci;
+mod cmf;
 mod disp;
 mod macd;
 mod mfi;
@@ -11,6 +12,7 @@ mod stochs;
 mod willr;
 
 pub use cci::*;
+pub use cmf::*;
 pub use disp::*;
 pub use macd::*;
 pub use mfi::*;

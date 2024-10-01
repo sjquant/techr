@@ -28,6 +28,14 @@ pub fn find_min(data: &[f64]) -> f64 {
     data.iter().cloned().fold(f64::INFINITY, f64::min)
 }
 
+pub fn calc_clv(high: f64, low: f64, close: f64) -> f64 {
+    if high == low {
+        0.0
+    } else {
+        ((close - low) - (high - close)) / (high - low)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -91,5 +99,18 @@ mod tests {
     fn test_find_min() {
         let result = find_min(&vec![1.0, 2.0, 3.0, 4.0, 5.0]);
         assert_eq!(result, 1.0);
+    }
+
+    #[test]
+    fn test_calc_clv() {
+        let test_cases = vec![
+            (1.0, 2.0, 3.0, -3.0),
+            (1.0, 2.0, 1.0, 1.0),
+            (1.0, 1.0, 1.0, 0.0),
+        ];
+        for (high, low, close, expected) in test_cases {
+            let result = calc_clv(high, low, close);
+            assert_eq!(result, expected);
+        }
     }
 }
