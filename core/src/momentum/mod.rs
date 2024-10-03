@@ -1,6 +1,7 @@
-pub mod adx;
+mod adx;
 mod adxr;
-pub mod aroon;
+mod aroon;
+mod aroonosc;
 mod cci;
 mod cmf;
 mod co;
@@ -17,7 +18,10 @@ mod stochf;
 mod stochs;
 mod willr;
 
+pub use adx::*;
 pub use adxr::*;
+pub use aroon::*;
+pub use aroonosc::*;
 pub use cci::*;
 pub use cmf::*;
 pub use co::*;
