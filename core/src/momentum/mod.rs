@@ -1,5 +1,6 @@
 pub mod adx;
 mod adxr;
+pub mod aroon;
 mod cci;
 mod cmf;
 mod co;
