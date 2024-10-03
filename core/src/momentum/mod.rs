@@ -1,4 +1,5 @@
 pub mod adx;
+mod adxr;
 mod cci;
 mod cmf;
 mod co;
@@ -15,6 +16,7 @@ mod stochf;
 mod stochs;
 mod willr;
 
+pub use adxr::*;
 pub use cci::*;
 pub use cmf::*;
 pub use co::*;
