@@ -17,6 +17,7 @@ mod roc;
 mod rsi;
 mod sonar;
 mod stochf;
+mod stochrsi;
 mod stochs;
 mod willr;
 
@@ -39,5 +40,6 @@ pub use roc::*;
 pub use rsi::*;
 pub use sonar::*;
 pub use stochf::*;
+pub use stochrsi::*;
 pub use stochs::*;
 pub use willr::*;
