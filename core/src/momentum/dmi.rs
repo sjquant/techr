@@ -1,3 +1,5 @@
+use crate::utils::get_true_ranges;
+
 pub fn dmi(
     highs: &[f64],
     lows: &[f64],
@@ -10,7 +12,7 @@ pub fn dmi(
 
     let delta_highs: Vec<f64> = highs.windows(2).map(|w| (w[1] - w[0]).max(0.0)).collect();
     let delta_lows: Vec<f64> = lows.windows(2).map(|w| (w[0] - w[1]).max(0.0)).collect();
-    let trs = get_trs(highs, lows, closes);
+    let trs = get_true_ranges(highs, lows, closes);
 
     let plus_dm: Vec<f64> = delta_highs
         .iter()
@@ -38,25 +40,6 @@ pub fn dmi(
     }
 
     (plus_di, minus_di)
-}
-
-fn get_trs(highs: &[f64], lows: &[f64], closes: &[f64]) -> Vec<f64> {
-    let mut result = Vec::with_capacity(highs.len() - 1);
-
-    for i in 1..highs.len() {
-        let high = highs[i];
-        let low = lows[i];
-        let prev_close = closes[i - 1];
-        result.push(calc_tr(high, low, prev_close));
-    }
-
-    result
-}
-
-fn calc_tr(high: f64, low: f64, prev_close: f64) -> f64 {
-    let th = high.max(prev_close);
-    let tl = low.min(prev_close);
-    th - tl
 }
 
 fn wilders_smoothing(data: &[f64], period: usize) -> Vec<f64> {

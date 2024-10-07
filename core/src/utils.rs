@@ -36,6 +36,25 @@ pub fn calc_clv(high: f64, low: f64, close: f64) -> f64 {
     }
 }
 
+pub fn get_true_ranges(highs: &[f64], lows: &[f64], closes: &[f64]) -> Vec<f64> {
+    let mut result = Vec::with_capacity(highs.len() - 1);
+
+    for i in 1..highs.len() {
+        let high = highs[i];
+        let low = lows[i];
+        let prev_close = closes[i - 1];
+        result.push(calc_tr(high, low, prev_close));
+    }
+
+    result
+}
+
+fn calc_tr(high: f64, low: f64, prev_close: f64) -> f64 {
+    let th = high.max(prev_close);
+    let tl = low.min(prev_close);
+    th - tl
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -112,5 +131,29 @@ mod tests {
             let result = calc_clv(high, low, close);
             assert_eq!(result, expected);
         }
+    }
+
+    #[test]
+    fn test_get_true_ranges() {
+        let highs = vec![
+            10.0, 12.0, 11.5, 13.0, 14.5, 13.5, 15.0, 16.0, 15.5, 17.0, 18.0, 17.5, 19.0, 20.0,
+            19.5, 21.0, 22.0, 21.5, 23.0, 24.0, 23.5,
+        ];
+        let lows = vec![
+            9.0, 10.5, 10.0, 11.5, 13.0, 12.0, 13.5, 14.5, 14.0, 15.5, 16.5, 16.0, 17.5, 18.5,
+            18.0, 19.5, 20.5, 20.0, 21.5, 22.5, 22.0,
+        ];
+        let closes = vec![
+            9.5, 11.5, 10.5, 12.5, 14.0, 13.0, 14.5, 15.5, 15.0, 16.5, 17.5, 17.0, 18.5, 19.5,
+            19.0, 20.5, 21.5, 21.0, 22.5, 23.5, 23.0,
+        ];
+
+        let expected = vec![
+            2.5, 1.5, 2.5, 2.0, 2.0, 2.0, 1.5, 1.5, 2.0, 1.5, 1.5, 2.0, 1.5, 1.5, 2.0, 1.5, 1.5,
+            2.0, 1.5, 1.5,
+        ];
+
+        let result = get_true_ranges(&highs, &lows, &closes);
+        assert_eq!(result, expected, "Failed for dynamic input");
     }
 }

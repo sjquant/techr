@@ -23,6 +23,7 @@ mod sonar;
 mod stochf;
 mod stochrsi;
 mod stochs;
+mod ultosc;
 mod willr;
 
 pub use adx::*;
@@ -50,4 +51,5 @@ pub use sonar::*;
 pub use stochf::*;
 pub use stochrsi::*;
 pub use stochs::*;
+pub use ultosc::*;
 pub use willr::*;
