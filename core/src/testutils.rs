@@ -21,7 +21,7 @@ pub fn load_data(path: &str, field: &str) -> Vec<f64> {
 pub fn load_expected<T: serde::de::DeserializeOwned>(path: &str) -> Vec<T> {
     use std::fs;
 
-    let data = fs::read_to_string(path).expect("Unable to read test data file");
+    let data = fs::read_to_string(path).expect(&format!("Unable to read test data file: {}", path));
     let res: Vec<T> = serde_json::from_str(&data).expect("Unable to parse test data");
     res
 }
